@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dota 2 Hub — Интерактивный портал</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        dota: {
+                            dark: '#090a0f',
+                            card: '#12151f',
+                            border: '#272b38',
+                            red: '#8b0000',
+                            brightRed: '#dc2626',
+                            gold: '#d4af37',
+                            goldLight: '#fbbf24',
+                            accent: '#1e2230'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, .font-cinzel {
+            font-family: 'Cinzel', serif;
+        }
+        .glow-gold {
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+        .glow-red {
+            text-shadow: 0 0 15px rgba(220, 38, 38, 0.5);
+        }
+        .bg-grid {
+            background-image: radial-gradient(rgba(212, 175, 55, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090a0f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #272b38;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8b0000;
+        }
+    </style>
+<script src="https://felo.ai/js/iframe.js?v=1792674194443"></script>
+ <style>
+* {
+  scrollbar-width: thin !important;
+  scrollbar-color: #bfc5ce transparent !important;
+}
+*::-webkit-scrollbar {
+  width: 6px !important;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: #bfc5ce !important;
+  border-radius: 9999px !important;
+}
+*::-webkit-scrollbar-track {
+  background-color: transparent !important;
+  border-radius: 9999px !important;
+}
+</style></head>
+<body class="bg-slate-900 text-slate-100 dark:bg-dota-dark dark:text-slate-100 min-h-screen selection:bg-red-900 selection:text-white bg-grid">
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 dark:bg-dota-dark/90 backdrop-blur-md border-b border-slate-800 dark:border-dota-border transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-700 to-amber-600 flex items-center justify-center border border-amber-500/50 shadow-lg shadow-red-900/30">
+                    <i class="fa-solid fa-shield-halved text-white text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-wider bg-gradient-to-r from-red-500 via-amber-400 to-amber-200 bg-clip-text text-transparent">DOTA 2 HUB</span>
+                    <span class="block text-[10px] text-amber-500/80 tracking-widest uppercase font-semibold">Interactive Portal</span>
+                </div>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-1 lg:space-x-6">
+                <a href="#home" class="px-3 py-2 text-sm font-medium hover:text-amber-400 transition-colors">Главная</a>
+                <a href="#heroes" class="px-3 py-2 text-sm font-medium hover:text-amber-400 transition-colors">Герои</a>
+                <a href="#items" class="px-3 py-2 text-sm font-medium hover:text-amber-400 transition-colors">Предметы</a>
+                <a href="#builder" class="px-3 py-2 text-sm font-medium hover:text-amber-400 transition-colors">Конструктор</a>
+                <a href="#simulator" class="px-3 py-2 text-sm font-medium hover:text-amber-400 transition-colors">MMR Симулятор</a>
+                <a href="#quiz" class="px-3 py-2 text-sm font-medium hover:text-amber-400 transition-colors">Викторина</a>
+                <a href="#patches" class="px-3 py-2 text-sm font-medium hover:text-amber-400 transition-colors">Патч 7.41f</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <button id="themeToggle" class="w-10 h-10 rounded-lg bg-slate-800 dark:bg-dota-card border border-slate-700 dark:border-dota-border flex items-center justify-center text-amber-400 hover:bg-slate-700 transition-all">
+                    <i class="fa-solid fa-moon dark:hidden"></i>
+                    <i class="fa-solid fa-sun hidden dark:block"></i>
+                </button>
+                <button id="mobileMenuBtn" class="md:hidden w-10 h-10 rounded-lg bg-slate-800 dark:bg-dota-card border border-slate-700 dark:border-dota-border flex items-center justify-center text-slate-300">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        <div id="mobileMenu" class="hidden md:hidden bg-slate-900/95 dark:bg-dota-dark/95 border-b border-slate-800 dark:border-dota-border px-4 pt-2 pb-4 space-y-2">
+            <a href="#home" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-sm">Главная</a>
+            <a href="#heroes" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-sm">Герои</a>
+            <a href="#items" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-sm">Предметы</a>
+            <a href="#builder" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-sm">Конструктор</a>
+            <a href="#simulator" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-sm">MMR Симулятор</a>
+            <a href="#quiz" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-sm">Викторина</a>
+            <a href="#patches" class="block px-3 py-2 rounded-lg hover:bg-slate-800 text-sm">Патч 7.41f</a>
+        </div>
+    </header>
+
+    <main class="pt-20">
+        <section id="home" class="relative min-h-[90vh] flex items-center justify-center overflow-hidden border-b border-slate-800 dark:border-dota-border py-20">
+            <div class="absolute inset-0 z-0">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 dark:from-dota-dark via-slate-900/60 dark:via-dota-dark/70 to-transparent z-10"></div>
+                <img src="https://file.felo.ai/images/s/3Fdx4PYnUW.png" alt="Dota 2 Epic Background" class="w-full h-full object-cover object-center scale-105 animate-pulse duration-[10000ms]">
+            </div>
+
+            <div class="relative z-20 max-w-5xl mx-auto px-4 text-center">
+                <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-red-950/60 border border-red-600/50 text-amber-400 text-xs font-semibold mb-6 tracking-widest uppercase shadow-lg shadow-red-950/50">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                    <span>Актуальная версия 7.41f</span>
+                </div>
+                
+                <h1 class="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight mb-6 text-white uppercase font-cinzel glow-gold">
+                    Битва древних <span class="bg-gradient-to-r from-red-600 to-amber-500 bg-clip-text text-transparent">начинается</span>
+                </h1>
+                
+                <p class="max-w-2xl mx-auto text-base sm:text-xl text-slate-300 dark:text-slate-300 mb-10 font-light leading-relaxed">
+                    Исследуйте полный каталог героев, настраивайте сборки предметов, тестируйте стратегии в симуляторе матчей и проверяйте свои знания в Dota 2.
+                </p>
+
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="#heroes" class="px-8 py-4 rounded-xl bg-gradient-to-r from-red-700 to-red-600 hover:from-red-600 hover:to-red-500 text-white font-bold tracking-wider uppercase shadow-xl shadow-red-900/40 border border-red-500/30 transition-all transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-users mr-2"></i> Каталог героев
+                    </a>
+                    <a href="#builder" class="px-8 py-4 rounded-xl bg-slate-800/90 dark:bg-dota-card/90 hover:bg-slate-700 text-amber-400 font-bold tracking-wider uppercase border border-amber-500/30 transition-all backdrop-blur-sm transform hover:-translate-y-0.5 shadow-xl">
+                        <i class="fa-solid fa-hammer mr-2"></i> Конструктор сборки
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto mt-20 pt-10 border-t border-slate-800/80 dark:border-dota-border/60">
+                    <div class="p-4 rounded-xl bg-slate-900/60 dark:bg-dota-card/50 border border-slate-800 dark:border-dota-border backdrop-blur-sm">
+                        <div class="text-2xl sm:text-3xl font-black text-amber-400 font-cinzel">126+</div>
+                        <div class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Героев в пуле</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-900/60 dark:bg-dota-card/50 border border-slate-800 dark:border-dota-border backdrop-blur-sm">
+                        <div class="text-2xl sm:text-3xl font-black text-red-500 font-cinzel">7.41f</div>
+                        <div class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Патч баланса</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-900/60 dark:bg-dota-card/50 border border-slate-800 dark:border-dota-border backdrop-blur-sm">
+                        <div class="text-2xl sm:text-3xl font-black text-amber-400 font-cinzel">100%</div>
+                        <div class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Интерактив</div>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-900/60 dark:bg-dota-card/50 border border-slate-800 dark:border-dota-border backdrop-blur-sm">
+                        <div class="text-2xl sm:text-3xl font-black text-red-500 font-cinzel">Offline</div>
+                        <div class="text-xs text-slate-400 mt-1 uppercase tracking-wider">Одиночный файл</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="heroes" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+                <div>
+                    <span class="text-xs font-bold tracking-widest text-red-500 uppercase">Энциклопедия</span>
+                    <h2 class="text-3xl sm:text-4xl font-black uppercase font-cinzel mt-1 text-white">Герои Dota 2</h2>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="relative">
+                        <input type="text" id="heroSearch" placeholder="Поиск героя..." class="bg-slate-800 dark:bg-dota-card border border-slate-700 dark:border-dota-border rounded-xl px-4 py-2.5 text-sm w-64 focus:outline-none focus:border-amber-500/60 transition-colors">
+                        <i class="fa-solid fa-magnifying-glass absolute right-4 top-3 text-slate-400"></i>
+                    </div>
+                    <button id="compareBtn" class="px-4 py-2.5 bg-amber-600/20 border border-amber-500/40 text-amber-400 rounded-xl text-sm font-semibold hover:bg-amber-600/30 transition-colors flex items-center space-x-2">
+                        <i class="fa-solid fa-scale-balanced"></i>
+                        <span>Сравнить (<span id="compareCount">0</span>/2)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-8">
+                <button class="hero-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-red-700 text-white shadow-lg shadow-red-900/40" data-filter="all">Все</button>
+                <button class="hero-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-slate-800 dark:bg-dota-card text-slate-300 hover:bg-slate-700 border border-slate-700 dark:border-dota-border" data-filter="str">Сила</button>
+                <button class="hero-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-slate-800 dark:bg-dota-card text-slate-300 hover:bg-slate-700 border border-slate-700 dark:border-dota-border" data-filter="agi">Ловкость</button>
+                <button class="hero-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-slate-800 dark:bg-dota-card text-slate-300 hover:bg-slate-700 border border-slate-700 dark:border-dota-border" data-filter="int">Интеллект</button>
+                <button class="hero-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-slate-800 dark:bg-dota-card text-slate-300 hover:bg-slate-700 border border-slate-700 dark:border-dota-border" data-filter="uni">Универсальные</button>
+            </div>
+
+            <div id="heroesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="items" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800 dark:border-dota-border">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+                <div>
+                    <span class="text-xs font-bold tracking-widest text-amber-500 uppercase">Снаряжение</span>
+                    <h2 class="text-3xl sm:text-4xl font-black uppercase font-cinzel mt-1 text-white">Каталог предметов</h2>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="relative">
+                        <input type="text" id="itemSearch" placeholder="Поиск предмета..." class="bg-slate-800 dark:bg-dota-card border border-slate-700 dark:border-dota-border rounded-xl px-4 py-2.5 text-sm w-64 focus:outline-none focus:border-amber-500/60 transition-colors">
+                        <i class="fa-solid fa-magnifying-glass absolute right-4 top-3 text-slate-400"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 mb-8">
+                <button class="item-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-amber-600 text-slate-950 shadow-lg shadow-amber-900/30" data-filter="all">Все</button>
+                <button class="item-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-slate-800 dark:bg-dota-card text-slate-300 hover:bg-slate-700 border border-slate-700 dark:border-dota-border" data-filter="basic">Расходники</button>
+                <button class="item-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-slate-800 dark:bg-dota-card text-slate-300 hover:bg-slate-700 border border-slate-700 dark:border-dota-border" data-filter="components">Компоненты</button>
+                <button class="item-filter px-4 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all bg-slate-800 dark:bg-dota-card text-slate-300 hover:bg-slate-700 border border-slate-700 dark:border-dota-border" data-filter="epic">Артефакты</button>
+            </div>
+
+            <div id="itemsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        </section>
+
+        <section id="builder" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800 dark:border-dota-border">
+            <div class="mb-10 text-center">
+                <span class="text-xs font-bold tracking-widest text-red-500 uppercase">Стратегия</span>
+                <h2 class="text-3xl sm:text-4xl font-black uppercase font-cinzel mt-1 text-white">Конструктор сборки</h2>
+                <p class="text-slate-400 text-sm mt-2">Выберите героя и до 6 предметов для расчёта характеристик и стоимости</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-5 space-y-6">
+                    <div class="p-6 rounded-2xl bg-slate-800/60 dark:bg-dota-card border border-slate-700 dark:border-dota-border backdrop-blur-sm">
+                        <h3 class="text-lg font-bold font-cinzel mb-4 text-amber-400">1. Выберите героя</h3>
+                        <select id="builderHeroSelect" class="w-full bg-slate-900 border border-slate-700 dark:border-dota-border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500/60 text-slate-100">
+                            <option value="">-- Выберите героя --</option>
+                        </select>
+                        <div id="builderHeroPreview" class="mt-6 flex items-center space-x-4 hidden">
+                            <div class="w-16 h-16 rounded-xl bg-slate-900 border border-amber-500/40 flex items-center justify-center text-3xl">
+                                <i id="builderHeroIcon" class="fa-solid fa-user-ninja text-amber-400"></i>
+                            </div>
+                            <div>
+                                <h4 id="builderHeroName" class="font-bold text-lg text-white"></h4>
+                                <p id="builderHeroRole" class="text-xs text-amber-500 uppercase tracking-wider"></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl bg-slate-800/60 dark:bg-dota-card border border-slate-700 dark:border-dota-border backdrop-blur-sm">
+                        <h3 class="text-lg font-bold font-cinzel mb-4 text-amber-400">Суммарные показатели сборки</h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between py-2 border-b border-slate-700/50 dark:border-dota-border/50">
+                                <span class="text-slate-400">Общая стоимость:</span>
+                                <span id="totalGold" class="font-bold text-amber-400">0 золота</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-slate-700/50 dark:border-dota-border/50">
+                                <span class="text-slate-400">Прирост здоровья:</span>
+                                <span id="totalHp" class="font-bold text-red-500">+0</span>
+                            </div>
+                            <div class="flex justify-between py-2 border-b border-slate-700/50 dark:border-dota-border/50">
+                                <span class="text-slate-400">Прирост урона:</span>
+                                <span id="totalDmg" class="font-bold text-amber-400">+0</span>
+                            </div>
+                            <div class="flex justify-between py-2">
+                                <span class="text-slate-400">Доп. броня:</span>
+                                <span id="totalArmor" class="font-bold text-blue-400">+0</span>
+                            </div>
+                        </div>
+                        <button id="resetBuilder" class="w-full mt-6 py-3 rounded-xl bg-red-950/60 border border-red-600/50 hover:bg-red-900/60 text-white font-semibold text-xs tracking-wider uppercase transition-colors">
+                            Очистить сборку
+                        </button>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 space-y-6">
+                    <div class="p-6 rounded-2xl bg-slate-800/60 dark:bg-dota-card border border-slate-700 dark:border-dota-border backdrop-blur-sm">
+                        <h3 class="text-lg font-bold font-cinzel mb-4 text-amber-400">2. Инвентарь предметов (0/6)</h3>
+                        <div id="builderSlots" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            <div class="builder-slot h-24 rounded-xl border-2 border-dashed border-slate-700 dark:border-dota-border flex flex-col items-center justify-center text-slate-500 text-xs">
+                                <i class="fa-solid fa-plus text-lg mb-1"></i> Слот 1
+                            </div>
+                            <div class="builder-slot h-24 rounded-xl border-2 border-dashed border-slate-700 dark:border-dota-border flex flex-col items-center justify-center text-slate-500 text-xs">
+                                <i class="fa-solid fa-plus text-lg mb-1"></i> Слот 2
+                            </div>
+                            <div class="builder-slot h-24 rounded-xl border-2 border-dashed border-slate-700 dark:border-dota-border flex flex-col items-center justify-center text-slate-500 text-xs">
+                                <i class="fa-solid fa-plus text-lg mb-1"></i> Слот 3
+                            </div>
+                            <div class="builder-slot h-24 rounded-xl border-2 border-dashed border-slate-700 dark:border-dota-border flex flex-col items-center justify-center text-slate-500 text-xs">
+                                <i class="fa-solid fa-plus text-lg mb-1"></i> Слот 4
+                            </div>
+                            <div class="builder-slot h-24 rounded-xl border-2 border-dashed border-slate-700 dark:border-dota-border flex flex-col items-center justify-center text-slate-500 text-xs">
+                                <i class="fa-solid fa-plus text-lg mb-1"></i> Слот 5
+                            </div>
+                            <div class="builder-slot h-24 rounded-xl border-2 border-dashed border-slate-700 dark:border-dota-border flex flex-col items-center justify-center text-slate-500 text-xs">
+                                <i class="fa-solid fa-plus text-lg mb-1"></i> Слот 6
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 rounded-2xl bg-slate-800/60 dark:bg-dota-card border border-slate-700 dark:border-dota-border backdrop-blur-sm">
+                        <h3 class="text-lg font-bold font-cinzel mb-4 text-amber-400">Доступные предметы для добавления</h3>
+                        <div id="builderItemsList" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-60 overflow-y-auto pr-2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulator" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-t border-slate-800 dark:border-dota-border">
+            <div class="mb-10 text-center">
+                <span class="text-xs font-bold tracking-widest text-amber-500 uppercase">Аналитика</span>
+                <h2 class="text-3xl sm:text-4xl font-black uppercase font-cinzel mt-1 text-white">Симулятор исхода боя и MMR</h2>
+                <p class="text-slate-400 text-sm mt-2">Соберите составы команд и рассчитайте шанс на победу</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="p-6 rounded-2xl bg-slate-800/60 dark:bg-dota-card border border-emerald-500/30 backdrop-blur-sm">
+                    <h3 class="text-lg font-bold font-cinzel mb-4 text-emerald-400 flex items-center">
+                        <i class="fa-solid fa-shield text-emerald-500 mr-2"></i>的天辉 (Radiant)
+                    </h3>
+                    <div id="radiantTeam" class="space-y-3 mb-4">
+                        <select class="radiant-select w-full bg-slate-900 border border-slate-700 dark:border-dota-border rounded-xl px-4 py-2.5 text-sm text-slate-100">
+                            <option value="">Выберите героя 1</option>
+                        </select>
+                        <select class="radiant-select w-full bg-slate-900 border border-slate-700 dark:border-dota-border rounded-xl px-4 py-2.5 text-sm text-slate-100">
+                            <option value="">Выберите героя 2</option>
+                        </select>
+                        <select class="radiant-select w-full bg-slate-900 border border-slate-700 dark:border-dota-border rounded-xl px-4 py-2.5 text-sm text-slate-100">
+                            <option value="">Выберите героя 3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl bg-slate-800/60 dark:bg-dota-card border border-red-500/30 backdrop-blur-sm">
+                    <h3 class="text-lg font-bold font-cinzel mb-4 text-red-400 flex items-center">
+                        <i class="fa-solid fa-skull text-red-500 mr-2"></i>夜魇 (Dire)
+                    </h3>
+                    <div id="direTeam" class="space-y-3 mb-4">
+                        <select class="dire-select w-full bg-slate-900 border border-slate-700 dark:border-dota-border rounded-xl px-4 py-2.5 text-sm text-slate-100">
+                            <option value="">Выберите героя 1</option>
+                        </select>
+                        <select class="dire-select w-full bg-slate-900 border border-slate-700 dark:border-dota-border rounded-xl px-4 py-2.5 text-sm text-slate-100">
+                            <option value="">Выберите героя 2</option>
+                        </select>
+                        <select class="dire-select w-full bg-slate-900 border border-slate-700 dark:border-dota-border rounded-xl px-4 py-2.5 text-sm text-slate-100">
+                            <option value="">Выберите героя 3</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button id="simulateBtn" class="px-8 py-4 bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 text-slate-950 font-bold rounded-xl tracking-wider uppercase shadow-xl transition-all">
+                    Запустить симуляцию боя
+                </button>
+            </div>
+
+            <div id="simResult" class="mt-8 hidden p-6 rounded-2xl bg-slate-800/80 dark:bg-dota-card border border-amber-500/40 text-center max-w-xl mx-auto">
+                <h4 class="text-xl font-bold font-cinzel text-amber-400 mb-2" id="simTitle">Результат симуляции</h4>
+                <p id="simDesc" class="text-slate-300 text-sm"></p>
+            </div>
+        </section>
+
+        <section id="quiz" class="py-20 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto border-t border-slate-800 dark:border-dota-border">
+            <div class="mb-10 text-center">
+                <span class="text-xs font-bold tracking-widest text-red-500 uppercase">Испытание</span>
+                <h2 class="text-3xl sm:text-4xl font-black uppercase font-cinzel mt-1 text-white">Викторина по Dota 2</h2>
+                <p class="text-slate-400 text-sm mt-2">Проверьте свои знания механик и истории игры</p>
+            </div>
+
+            <div class="p-8 rounded-3xl bg-slate-800/60 dark:bg-dota-card border border-slate-700 dark:border-dota-border backdrop-blur-sm relative overflow-hidden">
+                <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-700/50 dark:border-dota-border/50">
+                    <span id="quizProgress" class="text-xs font-semibold text-amber-500 uppercase tracking-wider">Вопрос 1 из 5</span>
+                    <span id="quizHighScore" class="text-xs font-semibold text-slate-400">Рекорд: 0</span>
+                </div>
+
+                <div id="quizContainer">
+                    <h3 id="quizQuestion" class="text-xl font-bold mb-6 text-white"></h3>
+                    <div id="quizOptions" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6"></div>
+                    <div class="flex justify-between items-center">
+                        <span id="quizTimer" class="text-sm font-bold text-red-500"><i class="fa-regular fa-clock mr-1"></i> 15с</span>
+                        <button id="quizNextBtn" class="px-6 py-2.5 bg-red-700 hover:bg-red-600 text-white rounded-xl text-xs font-bold uppercase tracking-wider hidden transition-colors">Следующий вопрос</button>
+                    </div>
+                </div>
+
+                <div id="quizFinished" class="text-center py-8 hidden">
+                    <h3 class="text-2xl font-bold font-cinzel text-amber-400 mb-4">Викторина завершена!</h3>
+                    <p id="quizScoreText" class="text-slate-300 text-lg mb-6"></p>
+                    <button id="quizRestartBtn" class="px-8 py-3 bg-red-700 hover:bg-red-600 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition-colors">Пройти снова</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="patches" class="py-20 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto border-t border-slate-800 dark:border-dota-border">
+            <div class="mb-10 text-center">
+                <span class="text-xs font-bold tracking-widest text-amber-500 uppercase">Обновления</span>
+                <h2 class="text-3xl sm:text-4xl font-black uppercase font-cinzel mt-1 text-white">Новости и Патч 7.41f</h2>
+            </div>
+
+            <div class="flex justify-center space-x-2 mb-8">
+                <button class="patch-tab px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-red-700 text-white transition-all shadow-lg shadow-red-900/30" data-tab="patch">Патч 7.41f</button>
+                <button class="patch-tab px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800 dark:bg-dota-card text-slate-300 hover:bg-slate-700 border border-slate-700 dark:border-dota-border transition-all" data-tab="esports">Киберспорт</button>
+            </div>
+
+            <div class="p-8 rounded-3xl bg-slate-800/60 dark:bg-dota-card border border-slate-700 dark:border-dota-border backdrop-blur-sm">
+                <div id="tabContentPatch" class="space-y-6">
+                    <div class="border-b border-slate-700/50 dark:border-dota-border/50 pb-4">
+                        <span class="text-xs text-amber-500 font-semibold">Изменения предметов</span>
+                        <h3 class="text-lg font-bold text-white mt-1">Daedalus & Heart of Tarrasque</h3>
+                        <p class="text-sm text-slate-300 mt-2">Стоимость рецепта Daedalus увеличена с 900 до 1000 золота (итоговая стоимость 5200g). Стоимость рецепта Heart of Tarrasque увеличена до 800 золота (итоговая 5300g).</p>
+                    </div>
+                    <div class="border-b border-slate-700/50 dark:border-dota-border/50 pb-4">
+                        <span class="text-xs text-amber-500 font-semibold">Баланс героев</span>
+                        <h3 class="text-lg font-bold text-white mt-1">Anti-Mage & Bounty Hunter</h3>
+                        <p class="text-sm text-slate-300 mt-2">Mana Break: урон от сожженной маны увеличен с 60% до 65%. У Track снижено бонусное золото для себя и союзников.</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-amber-500 font-semibold">Нейтральные предметы</span>
+                        <h3 class="text-lg font-bold text-white mt-1">Изменения зачарований</h3>
+                        <p class="text-sm text-slate-300 mt-2">Штраф к урону от зачарования Greedy увеличен с 30/60 до 35/70.</p>
+                    </div>
+                </div>
+
+                <div id="tabContentEsports" class="space-y-6 hidden">
+                    <div class="border-b border-slate-700/50 dark:border-dota-border/50 pb-4">
+                        <span class="text-xs text-red-500 font-semibold">Турниры FISSURE</span>
+                        <h3 class="text-lg font-bold text-white mt-1">Успешный старт сезона</h3>
+                        <p class="text-sm text-slate-300 mt-2">Команды начали выступление на UNIVERSE by FISSURE. Следите за обновлением таблиц матчей в реальном времени.</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-red-500 font-semibold">Составы</span>
+                        <h3 class="text-lg font-bold text-white mt-1">Изменения в ростере Team Yandex</h3>
+                        <p class="text-sm text-slate-300 mt-2">Коллектив выступает на первых матчах с заменами, однако сохраняет лидерские позиции в группе.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="heroModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 dark:bg-dota-card border border-slate-800 dark:border-dota-border rounded-3xl max-w-lg w-full p-6 relative shadow-2xl">
+            <button id="closeModal" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <footer class="bg-slate-950 dark:bg-dota-dark border-t border-slate-800 dark:border-dota-border py-12 px-4 sm:px-6 lg:px-8 text-center text-slate-500 text-sm">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-amber-400">DOTA 2 HUB</span>
+                <span>&copy; 2026</span>
+            </div>
+            <div class="flex space-x-6 text-slate-400">
+                <a href="#" class="hover:text-amber-400 transition-colors"><i class="fa-brands fa-steam text-lg"></i></a>
+                <a href="#" class="hover:text-amber-400 transition-colors"><i class="fa-brands fa-discord text-lg"></i></a>
+                <a href="#" class="hover:text-amber-400 transition-colors"><i class="fa-brands fa-telegram text-lg"></i></a>
+            </div>
+            <div>
+                <span>Автор: <strong class="text-slate-300">Агахрой Bebrovich</strong></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const heroesData = [
+            { id: 1, name: "Axe", attr: "str", role: "Offlaner", hp: 760, dmg: 60, armor: 4, desc: "Врывается в гущу врагов, заставляя атаковать себя и нанося урон контратаками." },
+            { id: 2, name: "Centaur Warrunner", attr: "str", role: "Offlaner", hp: 820, dmg: 64, armor: 5, desc: "Огромный запас здоровья и способность оглушать противников по площади." },
+            { id: 3, name: "Pudge", attr: "str", role: "Ganker", hp: 700, dmg: 55, armor: 2, desc: "Знаменитый мясник, притягивающий врагов крюком из туманом войны." },
+            { id: 4, name: "Tidehunter", attr: "str", role: "Initiator", hp: 780, dmg: 62, armor: 6, desc: "Проводит разрушительные инициации в командных боях с помощью ультимейта." },
+            { id: 5, name: "Juggernaut", attr: "agi", role: "Carry", hp: 600, dmg: 58, armor: 5, desc: "Неуязвимый в вихре клинков воин, способный разрезать любого одиночного врага." },
+            { id: 6, name: "Anti-Mage", attr: "agi", role: "Carry", hp: 580, dmg: 56, armor: 3, desc: "Сжигает маму врагов и наносит сокрушительный урон магам." },
+            { id: 7, name: "Phantom Assassin", attr: "agi", role: "Carry", hp: 560, dmg: 62, armor: 4, desc: "Мастер критических ударов и скрытности, избегающий физических атак." },
+            { id: 8, name: "Faceless Void", attr: "agi", role: "Carry", hp: 600, dmg: 54, armor: 4, desc: "Повелитель времени, способный останавливать время в куполе." },
+            { id: 9, name: "Luna", attr: "agi", role: "Carry", hp: 580, dmg: 68, armor: 5, desc: "Наносит огромный урон по площади своими лунными бумерангами." },
+            { id: 10, name: "Drow Ranger", attr: "agi", role: "Carry", hp: 540, dmg: 53, armor: 3, desc: "Ледяной стрелок дальнего боя, пробивающий любую броню." },
+            { id: 11, name: "Storm Spirit", attr: "int", role: "Semi-carry", hp: 560, мол: 52, armor: 2, desc: "Молниеносный маг, перемещающийся по всей карте в шаровой молнии." },
+            { id: 12, name: "Lina", attr: "int", role: "Nuker", hp: 550, dmg: 58, armor: 3, desc: "Обрушивает пламя на врагов с огромного расстояния." },
+            { id: 13, name: "Queen of Pain", attr: "int", role: "Semi-carry", hp: 550, dmg: 55, armor: 3, desc: "Королева боли с мощными заклинаниями и мгновенным блинком." },
+            { id: 14, name: "Crystal Maiden", attr: "int", role: "Support", hp: 500, dmg: 48, armor: 1, desc: "Восстанавливает ману союзникам и замораживает врагов." },
+            { id: 15, name: "Invoker", attr: "int", role: "Nuker", hp: 530, dmg: 45, armor: 2, desc: "Владеет десятью уникальными заклинаниями на все случаи жизни." },
+            { id: 16, name: "Lion", attr: "int", role: "Disabler", hp: 520, dmg: 52, armor: 2, desc: "Превращает врагов в животных и уничтожает ультимейтом." },
+            { id: 17, name: "Warlock", attr: "int", role: "Support", hp: 600, dmg: 50, armor: 3, desc: "Призывает жуткого голема и связывает врагов нитью судьбы." },
+            { id: 18, name: "Ogre Magi", attr: "uni", role: "Support", hp: 680, dmg: 55, armor: 4, desc: "Двуглавый огр, способный мульти-кастовать свои заклинания." },
+            { id: 19, name: "Tiny", attr: "uni", role: "Initiator", hp: 700, dmg: 65, armor: 3, desc: "Каменный гигант, бросающий камни и уничтожающий строения." },
+            { id: 20, name: "Monkey King", attr: "agi", role: "Carry", hp: 580, dmg: 60, armor: 4, desc: "Прыгает по деревьям и создает армию клонов." }
+        ];
+
+        const itemsData = [
+            { id: 1, name: "Town Portal Scroll", category: "basic", cost: 100, hp: 0, dmg: 0, armor: 0, desc: "Позволяет телепортироваться к союзным постройкам." },
+            { id: 2, name: "Clarity", category: "basic", cost: 50, hp: 0, dmg: 0, armor: 0, desc: "Восстанавливает ману со временем." },
+            { id: 3, name: "Faerie Fire", category: "basic", cost: 65, hp: 85, dmg: 2, armor: 0, desc: "Мгновенно восстанавливает здоровье при использовании." },
+            { id: 4, name: "Observer Ward", category: "basic", cost: 0, hp: 0, dmg: 0, armor: 0, desc: "Дает обзор в выбранной области." },
+            { id: 5, name: "Sentry Ward", category: "basic", cost: 50, hp: 0, dmg: 0, armor: 0, desc: "Раскрывает невидимость врагов." },
+            { id: 6, name: "Boots of Speed", category: "components", cost: 500, hp: 0, dmg: 0, armor: 0, desc: "Увеличивает скорость передвижения." },
+            { id: 7, name: "Blink Dagger", category: "epic", cost: 2250, hp: 0, dmg: 0, armor: 0, desc: "Телепортирует на небольшое расстояние." },
+            { id: 8, name: "Heart of Tarrasque", category: "epic", cost: 5300, hp: 500, dmg: 40, armor: 0, desc: "Огромный прирост здоровья и регенерации." },
+            { id: 9, name: "Daedalus", category: "epic", cost: 5200, hp: 0, dmg: 88, armor: 0, desc: "Дает шанс нанести критический урон." },
+            { id: 10, name: "Octarine Core", category: "epic", cost: 5100, hp: 0, dmg: 0, armor: 0, desc: "Уменьшает перезарядку способностей и предметов." },
+            { id: 11, name: "Force Staff", category: "epic", cost: 2200, hp: 0, dmg: 10, armor: 3, desc: "Толкает выбранное существо вперед." },
+            { id: 12, name: "Eul's Scepter", category: "epic", cost: 2600, hp: 0, dmg: 0, armor: 0, desc: "Поднимает цель в торнадо на 2.5 секунды." }
+        ];
+
+        let favorites = JSON.parse(localStorage.getItem('dota_favorites') || '[]');
+        let compareList = [];
+        let builderSelectedHero = null;
+        let builderItems = [];
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        });
+
+        function renderHeroes(filter = 'all', search = '') {
+            const grid = document.getElementById('heroesGrid');
+            grid.innerHTML = '';
+
+            const filtered = heroesData.filter(h => {
+                const matchFilter = filter === 'all' || h.attr === filter;
+                const matchSearch = h.name.toLowerCase().includes(search.toLowerCase());
+                return matchFilter && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center py-10 text-slate-500">Герои не найдены</div>`;
+                return;
+            }
+
+            filtered.forEach(hero => {
+                const isFav = favorites.includes(hero.id);
+                const isCompared = compareList.includes(hero.id);
+                const attrColor = hero.attr === 'str' ? 'text-red-500' : hero.attr === 'agi' ? 'text-emerald-500' : hero.attr === 'int' ? 'text-blue-500' : 'text-amber-400';
+                const attrName = hero.attr === 'str' ? 'Сила' : hero.attr === 'agi' ? 'Ловкость' : hero.attr === 'int' ? 'Интеллект' : 'Универсальный';
+
+                const card = document.createElement('div');
+                card.className = `p-6 rounded-2xl bg-slate-800/60 dark:bg-dota-card border border-slate-700 dark:border-dota-border backdrop-blur-sm flex flex-col justify-between hover:border-amber-500/50 transition-all group`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <span class="text-xs font-semibold ${attrColor} uppercase tracking-wider">${attrName}</span>
+                                <h3 class="text-xl font-bold font-cinzel text-white group-hover:text-amber-400 transition-colors">${hero.name}</h3>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button onclick="toggleFavorite(${hero.id})" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center ${isFav ? 'text-amber-400' : 'text-slate-500'} hover:text-amber-400 transition-colors">
+                                    <i class="fa-solid fa-star text-xs"></i>
+                                </button>
+                                <button onclick="toggleCompare(${hero.id})" class="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center ${isCompared ? 'text-red-500' : 'text-slate-500'} hover:text-red-500 transition-colors">
+                                    <i class="fa-solid fa-scale-balanced text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs text-amber-500 mb-2 font-medium">Роль: ${hero.role}</p>
+                        <p class="text-sm text-slate-300 mb-6 line-clamp-2">${hero.desc}</p>
+                    </div>
+                    <div class="pt-4 border-t border-slate-700/50 dark:border-dota-border/50 flex items-center justify-between">
+                        <div class="text-xs text-slate-400">Здоровье: <strong class="text-white">${hero.hp}</strong></div>
+                        <button onclick="openHeroModal(${hero.id})" class="px-4 py-2 bg-slate-900 border border-slate-700 hover:border-amber-500/50 text-slate-200 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors">
+                            Подробнее
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.toggleFavorite = (id) => {
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(f => f !== id);
+            } else {
+                favorites.push(id);
+            }
+            localStorage.setItem('dota_favorites', JSON.stringify(favorites));
+            renderHeroes(currentHeroFilter, document.getElementById('heroSearch').value);
+        };
+
+        window.toggleCompare = (id) => {
+            if (compareList.includes(id)) {
+                compareList = compareList.filter(c => c !== id);
+            } else {
+                if (compareList.length >= 2) {
+                    compareList.shift();
+                }
+                compareList.push(id);
+            }
+            document.getElementById('compareCount').textContent = compareList.length;
+            if (compareList.length === 2) {
+                showCompareModal();
+            }
+        };
+
+        function showCompareModal() {
+            const h1 = heroesData.find(h => h.id === compareList[0]);
+            const h2 = heroesData.find(h => h.id === compareList[1]);
+            const modal = document.getElementById('heroModal');
+            const content = document.getElementById('modalContent');
+            content.innerHTML = `
+                <h3 class="text-2xl font-bold font-cinzel text-amber-400 mb-6 text-center">Сравнение героев</h3>
+                <div class="grid grid-cols-2 gap-4 text-center">
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+                        <h4 class="font-bold font-cinzel text-lg text-white mb-2">${h1.name}</h4>
+                        <p class="text-xs text-amber-500 mb-4">${h1.role}</p>
+                        <p class="text-xs text-slate-300 mb-2">Здоровье: <strong>${h1.hp}</strong></p>
+                        <p class="text-xs text-slate-300 mb-2">Урон: <strong>${h1.dmg}</strong></p>
+                        <p class="text-xs text-slate-300">Броня: <strong>${h1.armor}</strong></p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-900 border border-slate-800">
+                        <h4 class="font-bold font-cinzel text-lg text-white mb-2">${h2.name}</h4>
+                        <p class="text-xs text-amber-500 mb-4">${h2.role}</p>
+                        <p class="text-xs text-slate-300 mb-2">Здоровье: <strong>${h2.hp}</strong></p>
+                        <p class="text-xs text-slate-300 mb-2">Урон: <strong>${h2.dmg}</strong></p>
+                        <p class="text-xs text-slate-300">Броня: <strong>${h2.armor}</strong></p>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        }
+
+        window.openHeroModal = (id) => {
+            const hero = heroesData.find(h => h.id === id);
+            const modal = document.getElementById('heroModal');
+            const content = document.getElementById('modalContent');
+            content.innerHTML = `
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold font-cinzel text-amber-400">${hero.name}</h3>
+                    <span class="text-xs font-semibold text-red-500 uppercase tracking-wider">${hero.role}</span>
+                </div>
+                <p class="text-slate-300 text-sm mb-6 leading-relaxed">${hero.desc}</p>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="block text-xs text-slate-400">Здоровье</span>
+                        <strong class="text-white text-sm">${hero.hp}</strong>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="block text-xs text-slate-400">Урон</span>
+                        <strong class="text-white text-sm">${hero.dmg}</strong>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800">
+                        <span class="block text-xs text-slate-400">Броня</span>
+                        <strong class="text-white text-sm">${hero.armor}</strong>
+                    </div>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+        };
+
+        document.getElementById('closeModal').addEventListener('click', () => {
+            document.getElementById('heroModal').classList.add('hidden');
+        });
+
+        let currentHeroFilter = 'all';
+        document.querySelectorAll('.hero-filter').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.hero-filter').forEach(b => b.classList.remove('bg-red-700', 'text-white', 'shadow-lg', 'shadow-red-900/40'));
+                document.querySelectorAll('.hero-filter').forEach(b => b.classList.add('bg-slate-800', 'dark:bg-dota-card', 'text-slate-300'));
+                e.target.classList.remove('bg-slate-800', 'dark:bg-dota-card', 'text-slate-300');
+                e.target.classList.add('bg-red-700', 'text-white', 'shadow-lg', 'shadow-red-900/40');
+                currentHeroFilter = e.target.dataset.filter;
+                renderHeroes(currentHeroFilter, document.getElementById('heroSearch').value);
+            });
+        });
+
+        document.getElementById('heroSearch').addEventListener('input', (e) => {
+            renderHeroes(currentHeroFilter, e.target.value);
+        });
+
+        function renderItems(filter = 'all', search = '') {
+            const grid = document.getElementById('itemsGrid');
+            grid.innerHTML = '';
+
+            const filtered = itemsData.filter(i => {
+                const matchFilter = filter === 'all' || i.category === filter;
+                const matchSearch = i.name.toLowerCase().includes(search.toLowerCase());
+                return matchFilter && matchSearch;
+            });
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `p-6 rounded-2xl bg-slate-800/60 dark:bg-dota-card border border-slate-700 dark:border-dota-border backdrop-blur-sm flex flex-col justify-between`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 class="text-lg font-bold font-cinzel text-white">${item.name}</h3>
+                            <span class="px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">${item.cost} г.</span>
+                        </div>
+                        <p class="text-sm text-slate-300 mb-4">${item.desc}</p>
+                    </div>
+                    <div class="pt-4 border-t border-slate-700/50 dark:border-dota-border/50 flex justify-between text-xs text-slate-400">
+                        <span>Здоровье: <strong class="text-white">+${item.hp}</strong></span>
+                        <span>Урон: <strong class="text-white">+${item.dmg}</strong></span>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        let currentItemFilter = 'all';
+        document.querySelectorAll('.item-filter').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.item-filter').forEach(b => b.classList.remove('bg-amber-600', 'text-slate-950', 'shadow-lg', 'shadow-amber-900/30'));
+                document.querySelectorAll('.item-filter').forEach(b => b.classList.add('bg-slate-800', 'dark:bg-dota-card', 'text-slate-300'));
+                e.target.classList.remove('bg-slate-800', 'dark:bg-dota-card', 'text-slate-300');
+                e.target.classList.add('bg-amber-600', 'text-slate-950', 'shadow-lg', 'shadow-amber-900/30');
+                currentItemFilter = e.target.dataset.filter;
+                renderItems(currentItemFilter, document.getElementById('itemSearch').value);
+            });
+        });
+
+        document.getElementById('itemSearch').addEventListener('input', (e) => {
+            renderItems(currentItemFilter, e.target.value);
+        });
+
+        function initBuilder() {
+            const select = document.getElementById('builderHeroSelect');
+            heroesData.forEach(hero => {
+                const opt = document.createElement('option');
+                opt.value = hero.id;
+                opt.textContent = hero.name;
+                select.appendChild(opt);
+            });
+
+            select.addEventListener('change', (e) => {
+                const heroId = parseInt(e.target.value);
+                builderSelectedHero = heroesData.find(h => h.id === heroId);
+                const preview = document.getElementById('builderHeroPreview');
+                if (builderSelectedHero) {
+                    preview.classList.remove('hidden');
+                    document.getElementById('builderHeroName').textContent = builderSelectedHero.name;
+                    document.getElementById('builderHeroRole').textContent = builderSelectedHero.role;
+                } else {
+                    preview.classList.add('hidden');
+                }
+                updateBuilderStats();
+            });
+
+            const itemsList = document.getElementById('builderItemsList');
+            itemsData.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between cursor-pointer hover:border-amber-500/50 transition-colors`;
+                div.innerHTML = `
+                    <div>
+                        <span class="block text-xs font-bold text-white">${item.name}</span>
+                        <span class="text-[10px] text-amber-400">${item.cost} золота</span>
+                    </div>
+                    <button onclick="addBuilderItem(${item.id})" class="w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 hover:text-amber-400">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                    </button>
+                `;
+                itemsList.appendChild(div);
+            });
+        }
+
+        window.addBuilderItem = (itemId) => {
+            if (builderItems.length >= 6) return;
+            const item = itemsData.find(i => i.id === itemId);
+            builderItems.push(item);
+            updateBuilderSlots();
+            updateBuilderStats();
+        };
+
+        window.removeBuilderItem = (index) => {
+            builderItems.splice(index, 1);
+            updateBuilderSlots();
+            updateBuilderStats();
+        };
+
+        function updateBuilderSlots() {
+            const slots = document.querySelectorAll('.builder-slot');
+            slots.forEach((slot, index) => {
+                if (builderItems[index]) {
+                    const item = builderItems[index];
+                    slot.className = `builder-slot h-24 rounded-xl border border-amber-500/40 bg-slate-900 p-3 flex flex-col justify-between relative`;
+                    slot.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <span class="text-xs font-bold text-white truncate">${item.name}</span>
+                            <button onclick="removeBuilderItem(${index})" class="text-red-500 hover:text-red-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <span class="text-[10px] text-amber-400">${item.cost} золота</span>
+                    `;
+                } else {
+                    slot.className = `builder-slot h-24 rounded-xl border-2 border-dashed border-slate-700 dark:border-dota-border flex flex-col items-center justify-center text-slate-500 text-xs`;
+                    slot.innerHTML = `<i class="fa-solid fa-plus text-lg mb-1"></i> Слот ${index + 1}`;
+                }
+            });
+        }
+
+        function updateBuilderStats() {
+            let gold = 0;
+            let hp = builderSelectedHero ? builderSelectedHero.hp : 0;
+            let dmg = builderSelectedHero ? builderSelectedHero.dmg : 0;
+            let armor = builderSelectedHero ? builderSelectedHero.armor : 0;
+
+            builderItems.forEach(item => {
+                gold += item.cost;
+                hp += item.hp;
+                dmg += item.dmg;
+                armor += item.armor;
+            });
+
+            document.getElementById('totalGold').textContent = `${gold} золота`;
+            document.getElementById('totalHp').textContent = `+${hp}`;
+            document.getElementById('totalDmg').textContent = `+${dmg}`;
+            document.getElementById('totalArmor').textContent = `+${armor}`;
+        }
+
+        document.getElementById('resetBuilder').addEventListener('click', () => {
+            builderItems = [];
+            builderSelectedHero = null;
+            document.getElementById('builderHeroSelect').value = '';
+            document.getElementById('builderHeroPreview').classList.add('hidden');
+            updateBuilderSlots();
+            updateBuilderStats();
+        });
+
+        function initSimulator() {
+            const radiantSelects = document.querySelectorAll('.radiant-select');
+            const direSelects = document.querySelectorAll('.dire-select');
+
+            radiantSelects.forEach(select => {
+                heroesData.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.id;
+                    opt.textContent = h.name;
+                    select.appendChild(opt);
+                });
+            });
+
+            direSelects.forEach(select => {
+                heroesData.forEach(h => {
+                    const opt = document.createElement('option');
+                    opt.value = h.id;
+                    opt.textContent = h.name;
+                    select.appendChild(opt);
+                });
+            });
+
+            document.getElementById('simulateBtn').addEventListener('click', () => {
+                const result = document.getElementById('simResult');
+                const title = document.getElementById('simTitle');
+                const desc = document.getElementById('simDesc');
+
+                const winChance = Math.floor(Math.random() * 41) + 30; // 30% - 70%
+                const isRadiant = Math.random() > 0.5;
+
+                result.classList.remove('hidden');
+                if (isRadiant) {
+                    title.textContent = "Победа команды的天辉 (Radiant)!";
+                    desc.textContent = `Шанс на победу составил ${100 - winChance}%. Отличная синергия героев и выбор линий.`;
+                } else {
+                    title.textContent = "Победа команды夜魇 (Dire)!";
+                    desc.textContent = `Шанс на победу составил ${winChance}%. Доминирование в поздней стадии игры принесло успех.`;
+                }
+            });
+        }
+
+        const quizData = [
+            { q: "Какой основной атрибут у героя Juggernaut?", options: ["Сила", "Ловкость", "Интеллект", "Универсальный"], correct: 1 },
+            { q: "Сколько золота стоит Town Portal Scroll по умолчанию?", options: ["50", "90", "100", "135"], correct: 2 },
+            { q: "Какой предмет дает невосприимчивость к магии?", options: ["Blink Dagger", "Black King Bar", "Heart of Tarrasque", "Daedalus"], correct: 1 },
+            { q: "Какая максимальная дальность у крюка Pudge на 4 уровне прокачки?", options: ["1000", "1200", "1300", "1400"], correct: 2 },
+            { q: "Сколько зарядов имеет бутыль (Bottle) при заполнении руной?", options: ["2", "3", "4", "5"], correct: 1 }
+        ];
+
+        let currentQuiz = 0;
+        let quizScore = 0;
+        let quizTimerVal = 15;
+        let quizInterval = null;
+
+        function initQuiz() {
+            loadQuizQuestion();
+            document.getElementById('quizRestartBtn').addEventListener('click', () => {
+                currentQuiz = 0;
+                quizScore = 0;
+                document.getElementById('quizFinished').classList.add('hidden');
+                document.getElementById('quizContainer').classList.remove('hidden');
+                loadQuizQuestion();
+            });
+
+            document.getElementById('quizNextBtn').addEventListener('click', () => {
+                currentQuiz++;
+                if (currentQuiz < quizData.length) {
+                    loadQuizQuestion();
+                } else {
+                    finishQuiz();
+                }
+            });
+        }
+
+        function loadQuizQuestion() {
+            clearInterval(quizInterval);
+            quizTimerVal = 15;
+            document.getElementById('quizTimer').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${quizTimerVal}с`;
+            document.getElementById('quizNextBtn').classList.add('hidden');
+
+            const item = quizData[currentQuiz];
+            document.getElementById('quizProgress').textContent = `Вопрос ${currentQuiz + 1} из ${quizData.length}`;
+            document.getElementById('quizQuestion').textContent = item.q;
+
+            const opts = document.getElementById('quizOptions');
+            opts.innerHTML = '';
+            item.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `p-4 rounded-xl bg-slate-900 border border-slate-800 text-left text-sm font-semibold text-slate-200 hover:border-amber-500/50 transition-colors`;
+                btn.textContent = opt;
+                btn.onclick = () => selectQuizAnswer(idx, item.correct);
+                opts.appendChild(btn);
+            });
+
+            quizInterval = setInterval(() => {
+                quizTimerVal--;
+                document.getElementById('quizTimer').innerHTML = `<i class="fa-regular fa-clock mr-1"></i> ${quizTimerVal}с`;
+                if (quizTimerVal <= 0) {
+                    clearInterval(quizInterval);
+                    selectQuizAnswer(-1, item.correct);
+                }
+            }, 1000);
+        }
+
+        function selectQuizAnswer(selected, correct) {
+            clearInterval(quizInterval);
+            const opts = document.getElementById('quizOptions').children;
+            for (let i = 0; i < opts.length; i++) {
+                opts[i].disabled = true;
+                if (i === correct) {
+                    opts[i].classList.add('bg-emerald-950/80', 'border-emerald-500', 'text-emerald-300');
+                } else if (i === selected) {
+                    opts[i].classList.add('bg-red-950/80', 'border-red-500', 'text-red-300');
+                }
+            }
+            if (selected === correct) {
+                quizScore++;
+            }
+            document.getElementById('quizNextBtn').classList.remove('hidden');
+        }
+
+        function finishQuiz() {
+            document.getElementById('quizContainer').classList.add('hidden');
+            document.getElementById('quizFinished').classList.remove('hidden');
+            document.getElementById('quizScoreText').textContent = `Вы ответили правильно на ${quizScore} из ${quizData.length} вопросов!`;
+
+            let highScore = parseInt(localStorage.getItem('dota_quiz_record') || '0');
+            if (quizScore > highScore) {
+                highScore = quizScore;
+                localStorage.setItem('dota_quiz_record', highScore);
+            }
+            document.getElementById('quizHighScore').textContent = `Рекорд: ${highScore}`;
+        }
+
+        document.querySelectorAll('.patch-tab').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.patch-tab').forEach(b => b.classList.remove('bg-red-700', 'text-white', 'shadow-lg', 'shadow-red-900/30'));
+                document.querySelectorAll('.patch-tab').forEach(b => b.classList.add('bg-slate-800', 'dark:bg-dota-card', 'text-slate-300'));
+                e.target.classList.remove('bg-slate-800', 'dark:bg-dota-card', 'text-slate-300');
+                e.target.classList.add('bg-red-700', 'text-white', 'shadow-lg', 'shadow-red-900/30');
+
+                const tab = e.target.dataset.tab;
+                if (tab === 'patch') {
+                    document.getElementById('tabContentPatch').classList.remove('hidden');
+                    document.getElementById('tabContentEsports').classList.add('hidden');
+                } else {
+                    document.getElementById('tabContentPatch').classList.add('hidden');
+                    document.getElementById('tabContentEsports').classList.remove('hidden');
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHeroes();
+            renderItems();
+            initBuilder();
+            initSimulator();
+            initQuiz();
+            const record = localStorage.getItem('dota_quiz_record') || '0';
+            document.getElementById('quizHighScore').textContent = `Рекорд: ${record}`;
+        });
+    </script>
+</body>
+</html>
